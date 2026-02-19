@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reproducción Secuencial de Videos</title>
+    <style>
+        /* Estilos base para ocupar toda la pantalla */
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            background: black;
+            font-family: Arial, sans-serif;
+        }
+
+        #player {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Estilos para el botón de inicio */
+        #start-button-overlay {
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.9);
+            color: white; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            font-size: 1.5em; 
+            text-align: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+
+        #start-button-overlay:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        #start-button-overlay span {
+            padding: 20px 40px;
+            border: 2px solid white;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="player"></div>
+
+    <div id="start-button-overlay" onclick="startPlayback()">
+        🔊 Haz clic para iniciar la reproducción
+        <span>Iniciar Videos</span>
+    </div>
+
+    <script>
+        // Lista de IDs de YouTube
+        const videoIDs = [
+            "NE9rq9BNkVk",
+            "l9fTtiEcJ8A",
+            "brrcpLq95Tc",
+            "yeRoMuUY-Kw",
+            "ZjX7cvp5mW0",
+            "pqTVAXKpASQ",
+            "JL9EKLnTKVg",
+            "3J4ocWuHxO8",
+            "Bw_ZUxdMh3k"
+        ];
+
+        let currentIndex = 0;
+        let player;
+
+        // Cargar la API de YouTube
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+
+        function onYouTubeIframeAPIReady() {
+            // Espera a que el usuario haga clic
+        }
+
+        function startPlayback() {
+            const startButton = document.getElementById('start-button-overlay');
+            
+            // Ocultar botón
+            startButton.style.opacity = '0';
+            setTimeout(() => startButton.style.display = 'none', 500);
+
+            // Inicializar el reproductor
+            player = new YT.Player('player', {
+                videoId: videoIDs[currentIndex],
+                playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    showinfo: 0,
+                    modestbranding: 1,
+                    rel: 0,
+                    fs: 0,
+                    mute: 0 // 🔊 Audio original activado
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                currentIndex++;
+                if (currentIndex < videoIDs.length) {
+                    player.loadVideoById(videoIDs[currentIndex]);
+                } else {
+                    currentIndex = 0;
+                    player.loadVideoById(videoIDs[currentIndex]);
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
